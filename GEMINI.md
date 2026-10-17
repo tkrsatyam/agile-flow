@@ -34,7 +34,11 @@ All foundational documents are located in the `docs/` directory:
 
 ## 4. Current State & Next Steps
 - **Phase 0 (Complete):** Architecture, PRD, ADRs, initial documentation, git setup, and GitHub repository initialized.
-- **Phase 1 (Next Up — MVP Scaffolding):**
-  1. `docker-compose.yml` for local PostgreSQL 16 database.
-  2. Spring Boot 4.x (Java 25) backend initialization with Maven wrapper, basic entities (`Project`, `Epic`, `Issue`, `SubTask`), repositories, and OpenAPI config.
-  3. React 19 + Vite + Tailwind CSS frontend initialization with touch-friendly Kanban board scaffold.
+- **Phase 1 (Complete — MVP Scaffolding):**
+  1. `docker-compose.yml` for local PostgreSQL 16 database with health check.
+  2. Spring Boot (Java 25 LTS) backend initialization with Maven wrapper (`mvnw`), JPA entities (`Project`, `Epic`, `Sprint`, `Issue`, `SubTask`), repositories, OpenAPI/Swagger UI 3.0, unified error handling, and test suite.
+  3. React 19 + Vite + Tailwind CSS frontend with touch-friendly Kanban board, mobile single-column focus carousel mode, checklist subtasks, and 3-field fast issue creation modal.
+- **Phase 2 (Next Up — Agile Planning & Sprints):**
+  1. Backlog planning view with drag-and-drop prioritization.
+  2. Sprint lifecycle management (Start, Active, Complete).
+  3. Column WIP limits and point velocity calculator.
