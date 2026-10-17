@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { CreateIssueDto, Epic, IssueStatus, IssueType } from '../types';
-import { X, Bookmark, Bug, CheckSquare, Sparkles } from 'lucide-react';
+import { X, Bookmark, Bug, CheckSquare } from 'lucide-react';
 
 interface CreateIssueModalProps {
   isOpen: boolean;
@@ -42,7 +42,6 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
       defaultStatus
     );
 
-    // Reset form
     setTitle('');
     setDescription('');
     setIssueType('STORY');
@@ -52,71 +51,68 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-100">
       <div 
-        className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
+        className="bg-white dark:bg-[#22272B] border border-[#DFE1E6] dark:border-[#38414A] rounded w-full max-w-lg shadow-xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <h3 className="text-base font-semibold text-slate-100">Create Work Item</h3>
-          </div>
+        {/* Atlassian Modal Header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#DFE1E6] dark:border-[#2C333A]">
+          <h3 className="text-sm font-semibold text-[#172B4D] dark:text-[#DEE4EA]">
+            Create issue
+          </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            className="p-1 rounded text-[#5E6C84] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
           {/* Issue Type Selector */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Item Type
+            <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1.5 uppercase text-[11px]">
+              Issue Type
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setIssueType('STORY')}
-                className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded border text-xs font-medium transition-colors ${
                   issueType === 'STORY'
-                    ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
-                    : 'border-slate-800 bg-slate-800/60 text-slate-400 hover:border-slate-700'
+                    ? 'border-[#0052CC] bg-[#DEEBFF] dark:bg-[#1D2B41] text-[#0052CC] dark:text-[#579DFF]'
+                    : 'border-[#DFE1E6] dark:border-[#38414A] bg-white dark:bg-[#1D2125] text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#F4F5F7]'
                 }`}
               >
-                <Bookmark className="w-3.5 h-3.5" />
-                <span>User Story</span>
+                <Bookmark className="w-3.5 h-3.5 text-[#36B37E]" />
+                <span>Story</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setIssueType('BUG')}
-                className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded border text-xs font-medium transition-colors ${
                   issueType === 'BUG'
-                    ? 'border-rose-500/50 bg-rose-500/15 text-rose-300'
-                    : 'border-slate-800 bg-slate-800/60 text-slate-400 hover:border-slate-700'
+                    ? 'border-[#E5493A] bg-[#FFEBE6] dark:bg-[#3D1E1B] text-[#BF2600] dark:text-[#FF8F73]'
+                    : 'border-[#DFE1E6] dark:border-[#38414A] bg-white dark:bg-[#1D2125] text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#F4F5F7]'
                 }`}
               >
-                <Bug className="w-3.5 h-3.5" />
-                <span>Defect / Bug</span>
+                <Bug className="w-3.5 h-3.5 text-[#E5493A]" />
+                <span>Bug</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setIssueType('TASK')}
-                className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded border text-xs font-medium transition-colors ${
                   issueType === 'TASK'
-                    ? 'border-sky-500/50 bg-sky-500/15 text-sky-300'
-                    : 'border-slate-800 bg-slate-800/60 text-slate-400 hover:border-slate-700'
+                    ? 'border-[#0065FF] bg-[#DEEBFF] dark:bg-[#1D2B41] text-[#0052CC] dark:text-[#579DFF]'
+                    : 'border-[#DFE1E6] dark:border-[#38414A] bg-white dark:bg-[#1D2125] text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#F4F5F7]'
                 }`}
               >
-                <CheckSquare className="w-3.5 h-3.5" />
+                <CheckSquare className="w-3.5 h-3.5 text-[#0065FF]" />
                 <span>Task</span>
               </button>
             </div>
@@ -124,8 +120,8 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
 
           {/* Title Field */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-              Title <span className="text-rose-400">*</span>
+            <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1.5 uppercase text-[11px]">
+              Summary <span className="text-[#DE350B]">*</span>
             </label>
             <input
               type="text"
@@ -133,21 +129,21 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
               autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. As a developer, I want quick keyboard shortcuts"
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500"
+              placeholder="e.g. User Registration & Login with Email/Password"
+              className="w-full bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#38414A] focus:bg-white dark:focus:bg-[#1D2125] focus:border-[#0052CC] dark:focus:border-[#579DFF] rounded px-3 py-1.5 text-xs text-[#172B4D] dark:text-[#DEE4EA] placeholder-[#8993A4] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
             />
           </div>
 
-          {/* Epic & Story Points Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Epic & Story Points */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Epic Parent
+              <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1.5 uppercase text-[11px]">
+                Parent Epic
               </label>
               <select
                 value={epicId}
                 onChange={(e) => setEpicId(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#38414A] rounded px-2.5 py-1.5 text-xs text-[#172B4D] dark:text-[#DEE4EA] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
               >
                 <option value="">None (Standalone)</option>
                 {epics.map((epic) => (
@@ -159,19 +155,19 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1.5 uppercase text-[11px]">
                 Story Points (Fibonacci)
               </label>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {FIBONACCI_POINTS.map((pts) => (
                   <button
                     key={pts}
                     type="button"
                     onClick={() => setStoryPoints(pts)}
-                    className={`flex-1 py-1.5 rounded-lg font-mono text-xs font-bold transition-all ${
+                    className={`flex-1 py-1 rounded font-mono text-xs font-bold border transition-colors ${
                       storyPoints === pts
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                        ? 'bg-[#0052CC] text-white border-[#0052CC]'
+                        : 'bg-white dark:bg-[#1D2125] border-[#DFE1E6] dark:border-[#38414A] text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#F4F5F7]'
                     }`}
                   >
                     {pts}
@@ -183,33 +179,33 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-              Description / Acceptance Criteria
+            <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1.5 uppercase text-[11px]">
+              Description
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Context, details, or checklist of requirements..."
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"
+              placeholder="Context, technical notes, or acceptance criteria..."
+              className="w-full bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#38414A] focus:bg-white dark:focus:bg-[#1D2125] focus:border-[#0052CC] dark:focus:border-[#579DFF] rounded px-3 py-1.5 text-xs text-[#172B4D] dark:text-[#DEE4EA] placeholder-[#8993A4] focus:outline-none focus:ring-1 focus:ring-[#0052CC] resize-none"
             />
           </div>
 
-          {/* Submit Action */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#DFE1E6] dark:border-[#2C333A]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+              className="px-3 py-1.5 text-xs font-semibold text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!title.trim()}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all"
+              className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0747A6] dark:bg-[#579DFF] dark:hover:bg-[#85B8FF] dark:text-[#161A1D] text-white font-semibold text-xs rounded transition-colors disabled:opacity-40"
             >
-              Create Item
+              Create
             </button>
           </div>
         </form>

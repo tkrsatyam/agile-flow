@@ -1,6 +1,17 @@
 import React from 'react';
 import type { Project } from '../types';
-import { Plus, Zap, Monitor, Smartphone, FolderKanban, ChevronDown, Layers } from 'lucide-react';
+import { 
+  Plus, 
+  Search, 
+  LayoutGrid, 
+  ChevronDown, 
+  Moon, 
+  Sun, 
+  Bell, 
+  HelpCircle,
+  Smartphone,
+  Monitor
+} from 'lucide-react';
 
 interface NavbarProps {
   currentProject: Project | null;
@@ -10,104 +21,147 @@ interface NavbarProps {
   isBackendConnected: boolean;
   viewMode: 'desktop' | 'mobile';
   onToggleViewMode: () => void;
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentProject,
   onOpenCreateModal,
   onOpenWorkspaceModal,
-  onOpenEpicModal,
   isBackendConnected,
   viewMode,
   onToggleViewMode,
+  theme,
+  onToggleTheme,
+  searchQuery = '',
+  onSearchChange,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        {/* Brand & Project Info */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-600/30">
-              <Zap className="w-4 h-4 text-white fill-white" />
+    <header className="sticky top-0 z-40 bg-white dark:bg-[#1D2125] border-b border-[#DFE1E6] dark:border-[#2C333A] px-3 sm:px-5 py-1.5 transition-colors">
+      <div className="flex items-center justify-between gap-3">
+        {/* Left Section: Atlassian App Grid + Logo + Spaces Switcher */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* App Switcher 9-dots */}
+          <button 
+            className="p-1.5 text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors"
+            title="Atlassian Apps"
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+
+          {/* AgileFlow Brand (Jira Style) */}
+          <div className="flex items-center gap-1.5 cursor-pointer" onClick={onOpenWorkspaceModal}>
+            <div className="w-5 h-5 bg-[#0052CC] rounded flex items-center justify-center text-white font-bold text-xs shadow-xs">
+              A
             </div>
-            <span className="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            <span className="font-bold text-sm text-[#172B4D] dark:text-[#DEE4EA] tracking-tight hidden sm:inline">
               AgileFlow
             </span>
+            <span 
+              className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-[#36B37E]' : 'bg-[#FFAB00]'}`} 
+              title={isBackendConnected ? 'Backend Connected' : 'Offline / Local Cache'} 
+            />
           </div>
 
-          {/* Interactive Workspace Switcher Button */}
+          <span className="text-[#C1C7D0] dark:text-[#3B444C] hidden sm:inline">|</span>
+
+          {/* Workspace Dropdown (Spaces / Project in Jira) */}
           <button
             onClick={onOpenWorkspaceModal}
-            className="flex items-center gap-2 pl-3 pr-2.5 py-1 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/60 hover:bg-slate-800/60 transition-all text-left group"
-            title="Switch or create project workspace"
+            className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] text-left transition-colors group"
+            title="Switch project workspace"
           >
-            <FolderKanban className="w-4 h-4 text-indigo-400" />
-            <span className="text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-indigo-300 font-mono border border-slate-700/60">
-              {currentProject?.key || 'FLOW'}
+            {/* Project Icon (Jira yellow-orange or blue badge) */}
+            <div className="w-4 h-4 rounded bg-[#FFAB00] text-[#172B4D] font-bold text-[10px] flex items-center justify-center shadow-xs">
+              {currentProject?.key?.[0] || 'O'}
+            </div>
+            <span className="text-xs font-semibold text-[#172B4D] dark:text-[#DEE4EA] max-w-[130px] sm:max-w-[200px] truncate">
+              {currentProject?.name || 'Orbit Delivery Management'}
             </span>
-            <span className="text-xs text-slate-300 group-hover:text-white truncate max-w-[140px] sm:max-w-[200px] hidden sm:inline">
-              {currentProject?.name || 'AgileFlow MVP'}
-            </span>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200 transition-transform" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#5E6C84] dark:text-[#8C9BAB]" />
           </button>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          {/* Connection Status Pill */}
-          <div
-            className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${
-              isBackendConnected
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-            }`}
-            title={isBackendConnected ? 'Connected to Spring Boot API' : 'Running with local state fallback'}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
-              }`}
+        {/* Center: Global Search Bar (Jira Style) */}
+        <div className="flex-1 max-w-xs sm:max-w-md hidden md:block">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#5E6C84] dark:text-[#8C9BAB]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              placeholder="Search"
+              className="w-full bg-[#F4F5F7] dark:bg-[#22272B] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] focus:bg-white dark:focus:bg-[#22272B] border border-[#DFE1E6] dark:border-[#2C333A] focus:border-[#0052CC] dark:focus:border-[#579DFF] rounded pl-8 pr-7 py-1 text-xs text-[#172B4D] dark:text-[#DEE4EA] placeholder-[#5E6C84] dark:placeholder-[#8C9BAB] focus:outline-none focus:ring-1 focus:ring-[#0052CC] transition-all"
             />
-            <span>{isBackendConnected ? 'API Connected' : 'Local Sandbox'}</span>
+            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono text-[#8993A4] dark:text-[#626F86] bg-white dark:bg-[#1D2125] px-1 rounded border border-[#DFE1E6] dark:border-[#2C333A]">
+              /
+            </kbd>
           </div>
+        </div>
 
-          {/* New Epic Trigger */}
+        {/* Right Section: + Create Button, Theme Toggle, Mobile Switcher, Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Solid Blue Create Button (Jira Iconic) */}
           <button
-            onClick={onOpenEpicModal}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60 transition-colors"
-            title="Create new Epic"
+            onClick={onOpenCreateModal}
+            className="flex items-center gap-1 bg-[#0052CC] hover:bg-[#0747A6] dark:bg-[#579DFF] dark:hover:bg-[#85B8FF] text-white dark:text-[#161A1D] px-2.5 sm:px-3 py-1 rounded text-xs font-semibold shadow-xs transition-colors"
           >
-            <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            <span>+ Epic</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Create</span>
           </button>
 
-          {/* View Mode Switcher */}
+          {/* Theme Toggle (Light / Dark) */}
           <button
-            onClick={onToggleViewMode}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 border border-slate-700/60 transition-colors"
-            title={`Switch to ${viewMode === 'desktop' ? 'Mobile Focus' : 'Desktop 4-Col'} view`}
+            onClick={onToggleTheme}
+            className="p-1.5 text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors"
+            title={theme === 'light' ? 'Switch to Dark theme' : 'Switch to Light theme'}
           >
-            {viewMode === 'desktop' ? (
-              <>
-                <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="hidden md:inline">Mobile Focus</span>
-              </>
+            {theme === 'light' ? (
+              <Moon className="w-4 h-4 text-[#5E6C84]" />
             ) : (
-              <>
-                <Monitor className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="hidden md:inline">Desktop Board</span>
-              </>
+              <Sun className="w-4 h-4 text-[#F5CD47]" />
             )}
           </button>
 
-          {/* Create Issue Primary Button */}
+          {/* View Mode Toggle (Mobile / Desktop) */}
           <button
-            onClick={onOpenCreateModal}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-md shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            onClick={onToggleViewMode}
+            className="p-1.5 text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors hidden sm:inline-flex"
+            title={`Switch to ${viewMode === 'desktop' ? 'Mobile Focus' : 'Desktop'}`}
           >
-            <Plus className="w-4 h-4" />
-            <span>New Issue</span>
+            {viewMode === 'desktop' ? (
+              <Smartphone className="w-4 h-4" />
+            ) : (
+              <Monitor className="w-4 h-4 text-[#0052CC] dark:text-[#579DFF]" />
+            )}
           </button>
+
+          {/* Notifications */}
+          <button 
+            className="p-1.5 text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors hidden sm:block"
+            title="Notifications"
+          >
+            <Bell className="w-4 h-4" />
+          </button>
+
+          {/* Help */}
+          <button 
+            className="p-1.5 text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors hidden sm:block"
+            title="Help & Shortcuts"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
+
+          {/* User Profile Avatar (Blue circle with letter 'S') */}
+          <div 
+            className="w-6 h-6 rounded-full bg-[#0052CC] text-white font-bold text-xs flex items-center justify-center cursor-pointer shadow-xs hover:ring-2 hover:ring-[#4C9AFF] transition-all"
+            title="Satyam (satyamk.1107@gmail.com)"
+          >
+            S
+          </div>
         </div>
       </div>
     </header>

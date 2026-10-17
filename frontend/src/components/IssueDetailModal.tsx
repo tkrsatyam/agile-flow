@@ -26,11 +26,11 @@ interface IssueDetailModalProps {
 
 const FIBONACCI_POINTS = [1, 2, 3, 5, 8, 13];
 
-const STATUS_OPTIONS: { status: IssueStatus; label: string; color: string }[] = [
-  { status: 'TODO', label: 'To Do', color: '#94A3B8' },
-  { status: 'IN_PROGRESS', label: 'In Progress', color: '#38BDF8' },
-  { status: 'REVIEW', label: 'In Review', color: '#F59E0B' },
-  { status: 'DONE', label: 'Done', color: '#10B981' },
+const STATUS_OPTIONS: { status: IssueStatus; label: string }[] = [
+  { status: 'TODO', label: 'To Do' },
+  { status: 'IN_PROGRESS', label: 'In Progress' },
+  { status: 'REVIEW', label: 'In Review' },
+  { status: 'DONE', label: 'Done' },
 ];
 
 export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
@@ -100,12 +100,12 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
   const renderTypeIcon = () => {
     switch (issueType) {
       case 'BUG':
-        return <Bug className="w-4 h-4 text-rose-400" />;
+        return <Bug className="w-3.5 h-3.5 text-[#E5493A] fill-[#E5493A]/10" />;
       case 'TASK':
-        return <CheckSquare className="w-4 h-4 text-sky-400" />;
+        return <CheckSquare className="w-3.5 h-3.5 text-[#0065FF] fill-[#0065FF]/10" />;
       case 'STORY':
       default:
-        return <Bookmark className="w-4 h-4 text-emerald-400" />;
+        return <Bookmark className="w-3.5 h-3.5 text-[#36B37E] fill-[#36B37E]/20" />;
     }
   };
 
@@ -113,66 +113,65 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
   const totalSubtasks = issue.subtasks?.length || 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-100">
       <div
-        className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-2xl flex flex-col overflow-hidden"
+        className="bg-white dark:bg-[#22272B] border border-[#DFE1E6] dark:border-[#38414A] rounded w-full max-w-2xl max-h-[90vh] shadow-xl flex flex-col overflow-hidden text-xs"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/60">
-          <div className="flex items-center gap-2.5">
-            <span className="p-1.5 rounded-lg bg-slate-800 border border-slate-700">
+        {/* Jira Header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#DFE1E6] dark:border-[#2C333A] bg-[#FAFBFC] dark:bg-[#1D2125]">
+          <div className="flex items-center gap-2">
+            <span className="p-1 rounded bg-[#EBECF0] dark:bg-[#2C333A]">
               {renderTypeIcon()}
             </span>
-            <div>
-              <span className="text-xs font-mono font-bold text-slate-400">{issue.key}</span>
-              <span className="text-xs text-slate-400 ml-2">in {issue.projectKey}</span>
-            </div>
+            <span className="font-mono font-bold text-xs text-[#5E6C84] dark:text-[#8C9BAB]">
+              {issue.key}
+            </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={handleDelete}
-              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-1.5 text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#DE350B] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors"
               title="Delete Issue"
             >
               <Trash2 className="w-4 h-4" />
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-1.5 text-[#5E6C84] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {/* Title Input */}
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {/* Title */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1 uppercase text-[11px]">
               Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-base font-medium text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="w-full bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#38414A] focus:bg-white dark:focus:bg-[#1D2125] focus:border-[#0052CC] rounded px-3 py-1.5 text-sm font-medium text-[#172B4D] dark:text-[#DEE4EA] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
             />
           </div>
 
-          {/* Grid Controls: Status, Type, Epic, Points */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80">
-            {/* Status Dropdown */}
+          {/* Grid Metadata: Status, Type, Epic, Points */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#FAFBFC] dark:bg-[#161A1D] p-3 rounded border border-[#DFE1E6] dark:border-[#2C333A]">
+            {/* Status */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1 uppercase text-[10px]">
                 Status
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as IssueStatus)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full bg-white dark:bg-[#22272B] border border-[#DFE1E6] dark:border-[#38414A] rounded px-2.5 py-1 text-xs text-[#172B4D] dark:text-[#DEE4EA] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
               >
                 {STATUS_OPTIONS.map((opt) => (
                   <option key={opt.status} value={opt.status}>
@@ -182,31 +181,31 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
               </select>
             </div>
 
-            {/* Issue Type */}
+            {/* Type */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1 uppercase text-[10px]">
                 Type
               </label>
               <select
                 value={issueType}
                 onChange={(e) => setIssueType(e.target.value as IssueType)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full bg-white dark:bg-[#22272B] border border-[#DFE1E6] dark:border-[#38414A] rounded px-2.5 py-1 text-xs text-[#172B4D] dark:text-[#DEE4EA] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
               >
-                <option value="STORY">User Story</option>
-                <option value="BUG">Defect / Bug</option>
+                <option value="STORY">Story</option>
+                <option value="BUG">Bug</option>
                 <option value="TASK">Task</option>
               </select>
             </div>
 
             {/* Epic Parent */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-                Epic Parent
+              <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1 uppercase text-[10px]">
+                Parent Epic
               </label>
               <select
                 value={epicId}
                 onChange={(e) => setEpicId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full bg-white dark:bg-[#22272B] border border-[#DFE1E6] dark:border-[#38414A] rounded px-2.5 py-1 text-xs text-[#172B4D] dark:text-[#DEE4EA] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
               >
                 <option value="">None (Standalone)</option>
                 {epics.map((epic) => (
@@ -219,19 +218,19 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
 
             {/* Story Points */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1 uppercase text-[10px]">
                 Story Points
               </label>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {FIBONACCI_POINTS.map((pts) => (
                   <button
                     key={pts}
                     type="button"
                     onClick={() => setStoryPoints(storyPoints === pts ? null : pts)}
-                    className={`flex-1 py-1.5 rounded-lg font-mono text-xs font-bold transition-all ${
+                    className={`flex-1 py-1 rounded font-mono text-xs font-bold border transition-colors ${
                       storyPoints === pts
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                        ? 'bg-[#0052CC] text-white border-[#0052CC]'
+                        : 'bg-white dark:bg-[#22272B] border-[#DFE1E6] dark:border-[#38414A] text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0]'
                     }`}
                   >
                     {pts}
@@ -243,62 +242,48 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-              Description & Acceptance Criteria
+            <label className="block font-semibold text-[#5E6C84] dark:text-[#8C9BAB] mb-1 uppercase text-[11px]">
+              Description
             </label>
             <textarea
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Context, technical notes, or definition of done..."
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y"
+              placeholder="Add a description or acceptance criteria..."
+              className="w-full bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#38414A] focus:bg-white dark:focus:bg-[#1D2125] focus:border-[#0052CC] rounded px-3 py-2 text-xs text-[#172B4D] dark:text-[#DEE4EA] placeholder-[#8993A4] focus:outline-none focus:ring-1 focus:ring-[#0052CC] resize-y"
             />
           </div>
 
           {/* Subtasks Checklist */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="font-semibold text-[#5E6C84] dark:text-[#8C9BAB] uppercase text-[11px]">
                 Checklist ({completedSubtasks}/{totalSubtasks})
               </label>
               {totalSubtasks > 0 && (
-                <span className="text-xs font-mono text-emerald-400">
-                  {Math.round((completedSubtasks / totalSubtasks) * 100)}% Complete
+                <span className="font-mono text-[#006644] dark:text-[#7EE2B8]">
+                  {Math.round((completedSubtasks / totalSubtasks) * 100)}%
                 </span>
               )}
             </div>
 
-            {/* Progress Bar */}
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
-              <div
-                className="bg-emerald-500 h-full transition-all duration-300"
-                style={{
-                  width: `${totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0}%`,
-                }}
-              />
-            </div>
-
             {/* List */}
-            <div className="space-y-2 mb-3">
+            <div className="space-y-1 mb-2">
               {issue.subtasks?.map((st) => (
                 <div
                   key={st.id}
-                  className="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-800 hover:border-slate-700 group transition-colors"
+                  className="flex items-center justify-between p-1.5 rounded bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#2C333A] hover:bg-white dark:hover:bg-[#1D2125] group"
                 >
                   <div
                     onClick={() => onToggleSubtask(st.id, !st.isCompleted, st.title)}
-                    className="flex items-center gap-2.5 cursor-pointer flex-1"
+                    className="flex items-center gap-2 cursor-pointer flex-1"
                   >
                     {st.isCompleted ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#36B37E] shrink-0" />
                     ) : (
-                      <Circle className="w-4 h-4 text-slate-400 shrink-0" />
+                      <Circle className="w-3.5 h-3.5 text-[#8993A4] shrink-0" />
                     )}
-                    <span
-                      className={`text-xs ${
-                        st.isCompleted ? 'line-through text-slate-400' : 'text-slate-200'
-                      }`}
-                    >
+                    <span className={st.isCompleted ? 'line-through text-[#8993A4]' : 'text-[#172B4D] dark:text-[#DEE4EA]'}>
                       {st.title}
                     </span>
                   </div>
@@ -306,10 +291,10 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                   {onDeleteSubtask && (
                     <button
                       onClick={() => onDeleteSubtask(st.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-400 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 p-0.5 text-[#8993A4] hover:text-[#DE350B]"
                       title="Delete subtask"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -317,20 +302,20 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
             </div>
 
             {/* Add Subtask Form */}
-            <form onSubmit={handleAddSubtaskSubmit} className="flex items-center gap-2">
+            <form onSubmit={handleAddSubtaskSubmit} className="flex items-center gap-1.5">
               <input
                 type="text"
                 value={newSubtaskTitle}
                 onChange={(e) => setNewSubtaskTitle(e.target.value)}
                 placeholder="Add checklist item..."
-                className="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="flex-1 bg-[#FAFBFC] dark:bg-[#161A1D] border border-[#DFE1E6] dark:border-[#38414A] rounded px-2.5 py-1 text-xs text-[#172B4D] dark:text-[#DEE4EA] focus:outline-none focus:ring-1 focus:ring-[#0052CC]"
               />
               <button
                 type="submit"
                 disabled={!newSubtaskTitle.trim()}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 text-xs font-medium rounded-xl flex items-center gap-1 transition-colors"
+                className="px-2.5 py-1 bg-[#EBECF0] dark:bg-[#2C333A] hover:bg-[#DFE1E6] disabled:opacity-40 text-[#172B4D] dark:text-[#DEE4EA] font-semibold text-xs rounded transition-colors flex items-center gap-1"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3 h-3" />
                 <span>Add</span>
               </button>
             </form>
@@ -338,11 +323,11 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800 bg-slate-900/60">
+        <div className="flex items-center justify-end gap-2 px-5 py-2.5 border-t border-[#DFE1E6] dark:border-[#2C333A] bg-[#FAFBFC] dark:bg-[#1D2125]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="px-3 py-1.5 text-xs font-semibold text-[#42526E] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors"
           >
             Cancel
           </button>
@@ -350,10 +335,10 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
             type="button"
             onClick={handleSave}
             disabled={isSaving || !title.trim()}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all"
+            className="px-4 py-1.5 bg-[#0052CC] hover:bg-[#0747A6] dark:bg-[#579DFF] dark:hover:bg-[#85B8FF] dark:text-[#161A1D] text-white font-semibold text-xs rounded flex items-center gap-1.5 transition-colors disabled:opacity-40"
           >
             <Save className="w-3.5 h-3.5" />
-            <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
+            <span>{isSaving ? 'Saving...' : 'Save'}</span>
           </button>
         </div>
       </div>

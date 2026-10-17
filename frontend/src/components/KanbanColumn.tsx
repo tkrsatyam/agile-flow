@@ -19,7 +19,6 @@ interface KanbanColumnProps {
 export const KanbanColumn: React.FC<KanbanColumnProps> = ({
   status,
   title,
-  color,
   issues,
   onStatusChange,
   onDeleteIssue,
@@ -56,64 +55,64 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`flex flex-col flex-1 min-w-[280px] max-w-[400px] h-full bg-slate-900/60 rounded-2xl border transition-all duration-200 ${
+      className={`flex flex-col flex-1 min-w-[270px] max-w-[360px] bg-[#F4F5F7] dark:bg-[#1D2125] rounded border transition-colors ${
         isDragOver
-          ? 'border-indigo-500/80 bg-slate-800/40 shadow-lg shadow-indigo-500/10 ring-2 ring-indigo-500/30'
-          : 'border-slate-800/80'
+          ? 'border-[#0052CC] dark:border-[#579DFF] bg-[#DEEBFF]/30 dark:bg-[#22272B]'
+          : 'border-[#EBECF0] dark:border-[#2C333A]'
       }`}
     >
-      {/* Column Header */}
-      <div className="flex items-center justify-between p-3.5 border-b border-slate-800/80">
-        <div className="flex items-center gap-2">
-          <span
-            className="w-2.5 h-2.5 rounded-full"
-            style={{ backgroundColor: color }}
-          />
-          <h3 className="text-sm font-semibold text-slate-200">{title}</h3>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono font-medium">
+      {/* Jira Column Header (e.g. "To Do 1") */}
+      <div className="flex items-center justify-between px-3 py-2.5">
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#5E6C84] dark:text-[#8C9BAB]">
+            {title}
+          </h3>
+          <span className="text-xs font-semibold text-[#5E6C84] dark:text-[#8C9BAB]">
             {issues.length}
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {totalPoints > 0 && (
-            <span className="text-xs font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700/50">
+            <span 
+              className="text-[10px] font-mono font-bold text-[#5E6C84] dark:text-[#8C9BAB] bg-[#EBECF0] dark:bg-[#22272B] px-1.5 py-0.5 rounded border border-[#DFE1E6] dark:border-[#2C333A]"
+              title={`${totalPoints} story points in this column`}
+            >
               {totalPoints} pts
             </span>
           )}
           <button
             onClick={() => onOpenCreateModal(status)}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-            title={`Add story to ${title}`}
+            className="p-1 rounded text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-[#DEE4EA] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] transition-colors"
+            title={`Create issue in ${title}`}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Cards List / Drop Target */}
-      <div className="flex-1 p-3 space-y-3 overflow-y-auto max-h-[calc(100vh-210px)] min-h-[300px]">
-        {issues.length === 0 ? (
-          <div
-            onClick={() => onOpenCreateModal(status)}
-            className="h-32 border-2 border-dashed border-slate-800 rounded-xl flex flex-col items-center justify-center text-slate-400 hover:border-slate-700 hover:text-slate-400 cursor-pointer transition-colors p-4 text-center"
-          >
-            <Plus className="w-5 h-5 mb-1" />
-            <span className="text-xs font-medium">Drop issue here or click to add</span>
-          </div>
-        ) : (
-          issues.map((issue) => (
-            <KanbanCard
-              key={issue.id}
-              issue={issue}
-              onStatusChange={onStatusChange}
-              onDelete={onDeleteIssue}
-              onToggleSubtask={onToggleSubtask}
-              onAddSubtask={onAddSubtask}
-              onClick={onCardClick}
-            />
-          ))
-        )}
+      {/* Cards Scroll Container */}
+      <div className="flex-1 px-2 pb-2 space-y-2 overflow-y-auto max-h-[calc(100vh-230px)] min-h-[350px]">
+        {issues.map((issue) => (
+          <KanbanCard
+            key={issue.id}
+            issue={issue}
+            onStatusChange={onStatusChange}
+            onDelete={onDeleteIssue}
+            onToggleSubtask={onToggleSubtask}
+            onAddSubtask={onAddSubtask}
+            onClick={onCardClick}
+          />
+        ))}
+
+        {/* Inline Quick Add Button at bottom of column */}
+        <button
+          onClick={() => onOpenCreateModal(status)}
+          className="w-full py-1.5 px-2 rounded hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] text-left text-xs text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-[#DEE4EA] flex items-center gap-1 transition-colors group"
+        >
+          <Plus className="w-3.5 h-3.5 text-[#5E6C84] dark:text-[#8C9BAB] group-hover:text-[#0052CC] dark:group-hover:text-[#579DFF]" />
+          <span>Create</span>
+        </button>
       </div>
     </div>
   );

@@ -1,28 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Project, Epic, Issue, IssueStatus, CreateIssueDto, EpicStatus, Sprint, UpdateIssueDto } from './types';
 import { api } from './services/api';
 import { Navbar } from './components/Navbar';
 import { MobileTabBar } from './components/MobileTabBar';
 import { KanbanColumn } from './components/KanbanColumn';
+import { BacklogView } from './components/BacklogView';
 import { CreateIssueModal } from './components/CreateIssueModal';
 import { WorkspaceModal } from './components/WorkspaceModal';
 import { CreateEpicModal } from './components/CreateEpicModal';
 import { IssueDetailModal } from './components/IssueDetailModal';
-import { Layers, CheckCircle2, Clock, Plus, Zap } from 'lucide-react';
+import { 
+  Kanban, 
+  ListTodo, 
+  Filter, 
+  Search, 
+  MoreHorizontal, 
+  Share2, 
+  Plus, 
+  Users
+} from 'lucide-react';
 
 const COLUMNS: { status: IssueStatus; title: string; color: string }[] = [
-  { status: 'TODO', title: 'To Do', color: '#94A3B8' },
-  { status: 'IN_PROGRESS', title: 'In Progress', color: '#38BDF8' },
+  { status: 'TODO', title: 'To Do', color: '#42526E' },
+  { status: 'IN_PROGRESS', title: 'In Progress', color: '#0052CC' },
   { status: 'REVIEW', title: 'In Review', color: '#F59E0B' },
-  { status: 'DONE', title: 'Done', color: '#10B981' },
+  { status: 'DONE', title: 'Done', color: '#36B37E' },
 ];
 
 const INITIAL_PROJECTS: Project[] = [
   {
     id: 'demo-proj-1',
-    key: 'FLOW',
-    name: 'AgileFlow MVP',
-    description: 'Lightweight, touch-friendly Agile project management workspace.',
+    key: 'ORDM',
+    name: 'Orbit Delivery Management',
+    description: 'Autonomous delivery fleet coordination and dispatch system.',
   },
 ];
 
@@ -30,20 +40,20 @@ const INITIAL_EPICS: Epic[] = [
   {
     id: 'epic-1',
     projectId: 'demo-proj-1',
-    key: 'FLOW-E1',
-    title: 'Kanban Experience',
-    color: '#3B82F6',
+    key: 'ORDM-E1',
+    title: '[Phase 1] Authentication & JWT Security',
+    color: '#6554C0',
     status: 'IN_PROGRESS',
-    issueCount: 2,
+    issueCount: 3,
   },
   {
     id: 'epic-2',
     projectId: 'demo-proj-1',
-    key: 'FLOW-E2',
-    title: 'Mobile Touch Polish',
-    color: '#10B981',
+    key: 'ORDM-E2',
+    title: '[Phase 1] Frontend Routes & UX',
+    color: '#0052CC',
     status: 'OPEN',
-    issueCount: 1,
+    issueCount: 2,
   },
 ];
 
@@ -51,91 +61,113 @@ const INITIAL_ISSUES: Issue[] = [
   {
     id: 'issue-1',
     projectId: 'demo-proj-1',
-    projectKey: 'FLOW',
-    epicId: 'epic-2',
-    epicKey: 'FLOW-E2',
-    epicTitle: 'Mobile Touch Polish',
-    epicColor: '#10B981',
-    key: 'FLOW-1',
-    title: 'Implement single-column swipe gestures on phone viewports',
-    description: 'Ensure users on screens < 768px can swipe horizontally between To Do, In Progress, Review, and Done.',
+    projectKey: 'ORDM',
+    epicId: 'epic-1',
+    epicKey: 'ORDM-E1',
+    epicTitle: '[Phase 1] Authentication & JWT...',
+    epicColor: '#6554C0',
+    key: 'ORDM-26',
+    title: 'User Registration & Login with Email/Password',
+    description: 'Implement secure registration, BCrypt password hashing, and token issue.',
     issueType: 'STORY',
     status: 'TODO',
     storyPoints: 5,
     rank: 1,
     subtasks: [
-      { id: 'st-1', title: 'Detect touch start & touch end coordinates', isCompleted: true, orderIndex: 0 },
-      { id: 'st-2', title: 'Animate active column transition', isCompleted: false, orderIndex: 1 },
+      { id: 'st-1', title: 'Validate email format and unique constraints', isCompleted: true, orderIndex: 0 },
+      { id: 'st-2', title: 'Return JWT and user payload on 201', isCompleted: false, orderIndex: 1 },
     ],
   },
   {
     id: 'issue-2',
     projectId: 'demo-proj-1',
-    projectKey: 'FLOW',
+    projectKey: 'ORDM',
     epicId: 'epic-1',
-    epicKey: 'FLOW-E1',
-    epicTitle: 'Kanban Experience',
-    epicColor: '#3B82F6',
-    key: 'FLOW-2',
-    title: 'Smooth 60 FPS drag-and-drop card interaction',
-    description: 'Integrate touch-aware DnD with instant optimistic state update and visual drag preview.',
+    epicKey: 'ORDM-E1',
+    epicTitle: '[Phase 1] Authentication & JWT...',
+    epicColor: '#6554C0',
+    key: 'ORDM-27',
+    title: 'JWT Issuance, Refresh Cookie & Rotation',
+    description: 'Ensure silent token rotation via httpOnly secure cookie.',
     issueType: 'STORY',
     status: 'IN_PROGRESS',
     storyPoints: 3,
     rank: 1,
     subtasks: [
-      { id: 'st-3', title: 'Wire up drag event handlers', isCompleted: true, orderIndex: 0 },
-      { id: 'st-4', title: 'Add column drop highlight styling', isCompleted: true, orderIndex: 1 },
+      { id: 'st-3', title: 'Configure Refresh Token Repository', isCompleted: true, orderIndex: 0 },
     ],
   },
   {
     id: 'issue-3',
     projectId: 'demo-proj-1',
-    projectKey: 'FLOW',
-    epicId: 'epic-1',
-    epicKey: 'FLOW-E1',
-    epicTitle: 'Kanban Experience',
-    epicColor: '#3B82F6',
-    key: 'FLOW-3',
-    title: 'Fix Fibonacci story point badge clipping on narrow cards',
-    description: 'Badge numbers 8 and 13 overflow card margin on viewport widths below 380px.',
-    issueType: 'BUG',
-    status: 'REVIEW',
-    storyPoints: 2,
-    rank: 1,
+    projectKey: 'ORDM',
+    epicId: 'epic-2',
+    epicKey: 'ORDM-E2',
+    epicTitle: '[Phase 1] Frontend Routes...',
+    epicColor: '#0052CC',
+    key: 'ORDM-28',
+    title: 'Frontend Protected Routes & AuthContext',
+    description: 'Provide React auth wrapper and redirect unauthenticated routes to /login.',
+    issueType: 'STORY',
+    status: 'TODO',
+    storyPoints: 3,
+    rank: 2,
     subtasks: [],
   },
   {
     id: 'issue-4',
     projectId: 'demo-proj-1',
-    projectKey: 'FLOW',
+    projectKey: 'ORDM',
     epicId: 'epic-1',
-    epicKey: 'FLOW-E1',
-    epicTitle: 'Kanban Experience',
-    epicColor: '#3B82F6',
-    key: 'FLOW-4',
-    title: 'Set up Spring Boot 4 + Java 25 backend REST endpoints',
-    description: 'Initialize Project, Epic, Issue, and SubTask domain services and OpenAPI docs.',
+    epicKey: 'ORDM-E1',
+    epicTitle: '[Phase 1] Authentication & JWT...',
+    epicColor: '#6554C0',
+    key: 'ORDM-29',
+    title: 'Logout with Token Invalidation',
+    description: 'Add token denylist or purge refresh token from DB on logout.',
+    issueType: 'STORY',
+    status: 'TODO',
+    storyPoints: 2,
+    rank: 3,
+    subtasks: [],
+  },
+  {
+    id: 'issue-5',
+    projectId: 'demo-proj-1',
+    projectKey: 'ORDM',
+    epicId: 'epic-1',
+    epicKey: 'ORDM-E1',
+    epicTitle: '[Phase 1] Authentication & JWT...',
+    epicColor: '#6554C0',
+    key: 'ORDM-30',
+    title: 'Shared Backend Request Infrastructure — Rate Limiting & Global Exception Handling',
+    description: 'Standardize RFC 7807 problem details response for all 4xx and 5xx API errors.',
     issueType: 'TASK',
-    status: 'DONE',
-    storyPoints: 3,
-    rank: 1,
-    subtasks: [
-      { id: 'st-5', title: 'Define JPA Entities & Repositories', isCompleted: true, orderIndex: 0 },
-      { id: 'st-6', title: 'Configure Springdoc OpenAPI 3.0', isCompleted: true, orderIndex: 1 },
-    ],
+    status: 'TODO',
+    storyPoints: 5,
+    rank: 4,
+    subtasks: [],
   },
 ];
 
 export function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('agileflow_theme') as 'light' | 'dark') || 'light';
+  });
+
+  const [activeTab, setActiveTab] = useState<'board' | 'backlog'>('board');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterOnlyMine, setFilterOnlyMine] = useState(false);
+
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [currentProject, setCurrentProject] = useState<Project>(INITIAL_PROJECTS[0]);
   const [epics, setEpics] = useState<Epic[]>(INITIAL_EPICS);
   const [issues, setIssues] = useState<Issue[]>(INITIAL_ISSUES);
+  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
+
   const [activeMobileStatus, setActiveMobileStatus] = useState<IssueStatus>('TODO');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [activeSprint, setActiveSprint] = useState<Sprint | null>(null);
 
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -145,7 +177,21 @@ export function App() {
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  // Detect screen size on load
+  // Sync Theme with HTML element
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('agileflow_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  // Detect mobile screen width on resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
@@ -208,7 +254,6 @@ export function App() {
         console.error('Failed to load project data', err);
       }
     } else {
-      // Local fallback filter
       setEpics(INITIAL_EPICS.filter((e) => e.projectId === found.id));
       setIssues(INITIAL_ISSUES.filter((i) => i.projectId === found.id));
       setActiveSprint(null);
@@ -261,7 +306,7 @@ export function App() {
     }
   };
 
-  // Handle Drag / Quick Move Status Update
+  // Handle Drag / Move Status Update
   const handleStatusChange = async (issueId: string, newStatus: IssueStatus) => {
     setIssues((prev) =>
       prev.map((item) =>
@@ -291,7 +336,7 @@ export function App() {
       epicKey: epic ? epic.key : null,
       epicTitle: epic ? epic.title : null,
       epicColor: epic ? epic.color : null,
-      sprintId: dto.sprintId || null,
+      sprintId: activeSprint?.id || null,
       key: newKey,
       title: dto.title,
       description: dto.description,
@@ -306,7 +351,10 @@ export function App() {
 
     if (isBackendConnected) {
       try {
-        const created = await api.createIssue(currentProject.id, dto);
+        const created = await api.createIssue(currentProject.id, {
+          ...dto,
+          sprintId: activeSprint?.id,
+        });
         if (initialStatus !== 'TODO') {
           await api.updateIssueStatus(created.id, initialStatus);
         }
@@ -436,23 +484,60 @@ export function App() {
     }
   };
 
-  // Compute status counts & story point tallies
+  // Complete Sprint Handler
+  const handleCompleteSprint = async () => {
+    if (!activeSprint) return;
+    if (window.confirm(`Complete ${activeSprint.name}?`)) {
+      if (isBackendConnected) {
+        await api.completeSprint(activeSprint.id);
+        setActiveSprint(null);
+      } else {
+        setActiveSprint(null);
+      }
+    }
+  };
+
+  // Create Sprint Handler
+  const handleCreateSprint = async () => {
+    if (isBackendConnected) {
+      const created = await api.createSprint(
+        currentProject.id,
+        `${currentProject.key} Sprint 2`,
+        'Next delivery iteration'
+      );
+      setActiveSprint(created);
+    } else {
+      const mockSprint: Sprint = {
+        id: `sprint-${Date.now()}`,
+        projectId: currentProject.id,
+        name: `${currentProject.key} Sprint 2`,
+        state: 'PLANNED',
+      };
+      setActiveSprint(mockSprint);
+    }
+  };
+
+  // Filtered issues based on search & assignee filter
+  const filteredIssues = useMemo(() => {
+    return issues.filter((i) => {
+      const matchesSearch = searchQuery === '' || 
+        i.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        i.key.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
+    });
+  }, [issues, searchQuery]);
+
   const columnCounts = COLUMNS.reduce(
     (acc, col) => {
-      acc[col.status] = issues.filter((i) => i.status === col.status).length;
+      acc[col.status] = filteredIssues.filter((i) => i.status === col.status).length;
       return acc;
     },
     {} as Record<IssueStatus, number>
   );
 
-  const totalPoints = issues.reduce((sum, i) => sum + (i.storyPoints || 0), 0);
-  const donePoints = issues
-    .filter((i) => i.status === 'DONE')
-    .reduce((sum, i) => sum + (i.storyPoints || 0), 0);
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {/* Main Navbar */}
+    <div className="min-h-screen bg-[#F4F5F7] dark:bg-[#161A1D] text-[#172B4D] dark:text-[#DEE4EA] flex flex-col font-sans transition-colors">
+      {/* 1. Atlassian Global Navigation Bar */}
       <Navbar
         currentProject={currentProject}
         onOpenCreateModal={() => handleOpenCreateModal('TODO')}
@@ -463,10 +548,152 @@ export function App() {
         onToggleViewMode={() =>
           setViewMode((prev) => (prev === 'desktop' ? 'mobile' : 'desktop'))
         }
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
-      {/* Mobile Top Status Tabs (<768px or Mobile simulation mode) */}
-      {viewMode === 'mobile' && (
+      {/* 2. Jira Project Header & Breadcrumbs (from Image 1) */}
+      <div className="bg-white dark:bg-[#1D2125] border-b border-[#DFE1E6] dark:border-[#2C333A] px-4 sm:px-6 pt-3 transition-colors">
+        <div className="max-w-7xl mx-auto">
+          {/* Breadcrumb: Spaces */}
+          <div className="text-[11px] text-[#5E6C84] dark:text-[#8C9BAB] font-medium mb-1">
+            Spaces
+          </div>
+
+          {/* Project Title Row */}
+          <div className="flex items-center justify-between gap-4 flex-wrap mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-5 h-5 rounded bg-[#FFAB00] text-[#172B4D] font-bold text-xs flex items-center justify-center shadow-xs">
+                {currentProject?.key?.[0] || 'O'}
+              </div>
+              <h1 className="text-lg font-bold text-[#172B4D] dark:text-[#DEE4EA] tracking-tight">
+                {currentProject?.name || 'Orbit Delivery Management'}
+              </h1>
+              <span className="p-1 text-[#5E6C84] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded cursor-pointer">
+                <Users className="w-4 h-4" />
+              </span>
+              <button 
+                onClick={() => setIsWorkspaceModalOpen(true)}
+                className="p-1 text-[#5E6C84] dark:text-[#8C9BAB] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Share / Export icons */}
+            <div className="flex items-center gap-2 text-[#5E6C84] dark:text-[#8C9BAB]">
+              <button className="p-1.5 hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] rounded transition-colors" title="Share Project">
+                <Share2 className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => setIsEpicModalOpen(true)}
+                className="text-xs px-2.5 py-1 rounded border border-[#DFE1E6] dark:border-[#38414A] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] text-[#172B4D] dark:text-[#DEE4EA] font-semibold flex items-center gap-1 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Epic</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Jira Navigation Tabs (Board, Backlog, Timeline, Reports) */}
+          <div className="flex items-center gap-6 overflow-x-auto text-xs font-semibold">
+            <button
+              onClick={() => setActiveTab('board')}
+              className={`pb-2.5 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'board'
+                  ? 'border-[#0052CC] dark:border-[#579DFF] text-[#0052CC] dark:text-[#579DFF]'
+                  : 'border-transparent text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-[#DEE4EA]'
+              }`}
+            >
+              <Kanban className="w-4 h-4" />
+              <span>Board</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('backlog')}
+              className={`pb-2.5 flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'backlog'
+                  ? 'border-[#0052CC] dark:border-[#579DFF] text-[#0052CC] dark:text-[#579DFF]'
+                  : 'border-transparent text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-[#DEE4EA]'
+              }`}
+            >
+              <ListTodo className="w-4 h-4" />
+              <span>Backlog</span>
+            </button>
+
+            <span className="pb-2.5 text-[#8993A4] dark:text-[#626F86] cursor-not-allowed whitespace-nowrap">
+              Summary
+            </span>
+            <span className="pb-2.5 text-[#8993A4] dark:text-[#626F86] cursor-not-allowed whitespace-nowrap">
+              Timeline
+            </span>
+            <span className="pb-2.5 text-[#8993A4] dark:text-[#626F86] cursor-not-allowed whitespace-nowrap">
+              Reports
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Jira Filter Bar (from Image 1 & 3) */}
+      <div className="px-4 sm:px-6 py-2.5 bg-[#FAFBFC] dark:bg-[#1D2125] border-b border-[#DFE1E6] dark:border-[#2C333A] transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 flex-wrap">
+          {/* Left: Search + Quick Filter Avatars + Filter Button */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Search Board input */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#5E6C84] dark:text-[#8C9BAB]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={activeTab === 'board' ? 'Search board' : 'Search backlog'}
+                className="bg-white dark:bg-[#22272B] border border-[#DFE1E6] dark:border-[#38414A] rounded pl-8 pr-3 py-1 text-xs text-[#172B4D] dark:text-[#DEE4EA] placeholder-[#5E6C84] dark:placeholder-[#8C9BAB] focus:outline-none focus:ring-1 focus:ring-[#0052CC] w-40 sm:w-56"
+              />
+            </div>
+
+            {/* Quick Avatar Filter: 'S' */}
+            <button
+              onClick={() => setFilterOnlyMine(!filterOnlyMine)}
+              className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
+                filterOnlyMine
+                  ? 'bg-[#0052CC] text-white ring-2 ring-[#0052CC] ring-offset-1'
+                  : 'bg-[#0052CC] text-white hover:opacity-90'
+              }`}
+              title="Filter by assigned to Satyam"
+            >
+              S
+            </button>
+
+            {/* Filter Dropdown Button */}
+            <button className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded border border-[#DFE1E6] dark:border-[#38414A] bg-white dark:bg-[#22272B] hover:bg-[#EBECF0] dark:hover:bg-[#2C333A] text-[#172B4D] dark:text-[#DEE4EA] transition-colors">
+              <Filter className="w-3.5 h-3.5 text-[#5E6C84] dark:text-[#8C9BAB]" />
+              <span>Filter</span>
+            </button>
+
+            {/* Group: Assignee Pill (Jira Style) */}
+            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-[#0052CC]/40 bg-[#DEEBFF]/50 dark:bg-[#1D2B41] text-[#0052CC] dark:text-[#579DFF]">
+              <span>Group: Assignee</span>
+            </div>
+          </div>
+
+          {/* Right: Complete sprint button (Jira solid blue) */}
+          <div className="flex items-center gap-2">
+            {activeSprint && (
+              <button
+                onClick={handleCompleteSprint}
+                className="flex items-center gap-1.5 bg-[#0052CC] hover:bg-[#0747A6] dark:bg-[#579DFF] dark:hover:bg-[#85B8FF] text-white dark:text-[#161A1D] px-3 py-1 rounded text-xs font-semibold shadow-xs transition-colors"
+              >
+                <span>Complete sprint</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Top Tabs (Single Column mode) */}
+      {viewMode === 'mobile' && activeTab === 'board' && (
         <MobileTabBar
           activeStatus={activeMobileStatus}
           onSelectStatus={setActiveMobileStatus}
@@ -474,107 +701,61 @@ export function App() {
         />
       )}
 
-      {/* Subheader: Board Quick Stats & Epics Bar */}
-      <div className="border-b border-slate-900 bg-slate-900/40 px-4 sm:px-6 py-2.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-          {/* Quick Metrics */}
-          <div className="flex items-center gap-4 text-xs text-slate-400">
-            {activeSprint && (
-              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                <Zap className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="font-semibold">{activeSprint.name}</span>
-                <span className="text-[10px] text-indigo-400/80">({activeSprint.state})</span>
-              </div>
-            )}
-            <div className="flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{issues.length} Issues</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-sky-400" />
-              <span>{totalPoints} Total Story Points</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{donePoints} Points Completed</span>
-            </div>
-          </div>
-
-          {/* Epics Badges Bar */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider hidden sm:inline">
-              Epics:
-            </span>
-            {epics.map((epic) => (
-              <span
-                key={epic.id}
-                className="text-xs px-2.5 py-0.5 rounded-full border flex items-center gap-1.5 whitespace-nowrap"
-                style={{
-                  borderColor: `${epic.color}40`,
-                  backgroundColor: `${epic.color}15`,
-                  color: epic.color,
-                }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: epic.color }}
-                />
-                <span className="font-medium">{epic.title}</span>
-              </span>
-            ))}
-
-            <button
-              onClick={() => setIsEpicModalOpen(true)}
-              className="text-xs px-2 py-0.5 rounded-full border border-dashed border-slate-700 text-slate-400 hover:text-indigo-300 hover:border-indigo-500/50 flex items-center gap-1 transition-colors"
-              title="Add Epic"
-            >
-              <Plus className="w-3 h-3" />
-              <span>New Epic</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Kanban Board Container */}
+      {/* 4. MAIN WORKSPACE CONTENT */}
       <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto overflow-hidden">
-        {viewMode === 'mobile' ? (
-          /* Mobile Single-Column Focused View */
-          <div className="h-full flex flex-col max-w-md mx-auto">
-            {COLUMNS.filter((col) => col.status === activeMobileStatus).map((col) => (
-              <KanbanColumn
-                key={col.status}
-                status={col.status}
-                title={col.title}
-                color={col.color}
-                issues={issues.filter((i) => i.status === col.status)}
-                onStatusChange={handleStatusChange}
-                onDeleteIssue={handleDeleteIssue}
-                onToggleSubtask={handleToggleSubtask}
-                onAddSubtask={handleAddSubtask}
-                onOpenCreateModal={handleOpenCreateModal}
-                onCardClick={handleOpenDetailModal}
-              />
-            ))}
-          </div>
+        {activeTab === 'backlog' ? (
+          /* JIRA BACKLOG VIEW (from Image 3) */
+          <BacklogView
+            sprint={activeSprint}
+            issues={filteredIssues}
+            epics={epics}
+            onOpenCreateModal={handleOpenCreateModal}
+            onOpenDetailModal={handleOpenDetailModal}
+            onStatusChange={handleStatusChange}
+            onCompleteSprint={handleCompleteSprint}
+            onCreateSprint={handleCreateSprint}
+          />
         ) : (
-          /* Desktop 4-Column Board */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full items-start">
-            {COLUMNS.map((col) => (
-              <KanbanColumn
-                key={col.status}
-                status={col.status}
-                title={col.title}
-                color={col.color}
-                issues={issues.filter((i) => i.status === col.status)}
-                onStatusChange={handleStatusChange}
-                onDeleteIssue={handleDeleteIssue}
-                onToggleSubtask={handleToggleSubtask}
-                onAddSubtask={handleAddSubtask}
-                onOpenCreateModal={handleOpenCreateModal}
-                onCardClick={handleOpenDetailModal}
-              />
-            ))}
-          </div>
+          /* JIRA KANBAN BOARD VIEW (from Image 1 & 2) */
+          viewMode === 'mobile' ? (
+            /* Mobile Single-Column Carousel */
+            <div className="h-full flex flex-col max-w-md mx-auto">
+              {COLUMNS.filter((col) => col.status === activeMobileStatus).map((col) => (
+                <KanbanColumn
+                  key={col.status}
+                  status={col.status}
+                  title={col.title}
+                  color={col.color}
+                  issues={filteredIssues.filter((i) => i.status === col.status)}
+                  onStatusChange={handleStatusChange}
+                  onDeleteIssue={handleDeleteIssue}
+                  onToggleSubtask={handleToggleSubtask}
+                  onAddSubtask={handleAddSubtask}
+                  onOpenCreateModal={handleOpenCreateModal}
+                  onCardClick={handleOpenDetailModal}
+                />
+              ))}
+            </div>
+          ) : (
+            /* Desktop Multi-Column Kanban Board */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 h-full items-start">
+              {COLUMNS.map((col) => (
+                <KanbanColumn
+                  key={col.status}
+                  status={col.status}
+                  title={col.title}
+                  color={col.color}
+                  issues={filteredIssues.filter((i) => i.status === col.status)}
+                  onStatusChange={handleStatusChange}
+                  onDeleteIssue={handleDeleteIssue}
+                  onToggleSubtask={handleToggleSubtask}
+                  onAddSubtask={handleAddSubtask}
+                  onOpenCreateModal={handleOpenCreateModal}
+                  onCardClick={handleOpenDetailModal}
+                />
+              ))}
+            </div>
+          )
         )}
       </main>
 

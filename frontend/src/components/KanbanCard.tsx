@@ -4,13 +4,11 @@ import {
   Bookmark, 
   Bug, 
   CheckSquare, 
+  Trash2, 
   ChevronRight, 
-  ChevronLeft, 
-  CheckCircle2, 
-  Circle, 
-  Plus, 
-  Trash2,
-  GripVertical
+  ChevronLeft,
+  CheckCircle2,
+  Circle
 } from 'lucide-react';
 
 interface KanbanCardProps {
@@ -30,14 +28,12 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
   onStatusChange,
   onDelete,
   onToggleSubtask,
-  onAddSubtask,
+  onAddSubtask: _onAddSubtask,
   onClick,
 }) => {
   const [showSubtasks, setShowSubtasks] = useState(false);
-  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
-  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
 
-  const completedSubtasks = issue.subtasks?.filter(st => st.isCompleted).length || 0;
+  const completedSubtasks = issue.subtasks?.filter((st) => st.isCompleted).length || 0;
   const totalSubtasks = issue.subtasks?.length || 0;
 
   const currentStatusIdx = STATUS_ORDER.indexOf(issue.status);
@@ -58,24 +54,16 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
     }
   };
 
-  const handleAddSubtaskSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newSubtaskTitle.trim()) {
-      onAddSubtask(issue.id, newSubtaskTitle.trim());
-      setNewSubtaskTitle('');
-      setIsAddingSubtask(false);
-    }
-  };
-
+  // Jira semantic issue type icon
   const renderTypeIcon = () => {
     switch (issue.issueType) {
       case 'BUG':
-        return <Bug className="w-3.5 h-3.5 text-rose-400" />;
+        return <Bug className="w-3.5 h-3.5 text-[#E5493A] fill-[#E5493A]/10 shrink-0" />;
       case 'TASK':
-        return <CheckSquare className="w-3.5 h-3.5 text-sky-400" />;
+        return <CheckSquare className="w-3.5 h-3.5 text-[#0065FF] fill-[#0065FF]/10 shrink-0" />;
       case 'STORY':
       default:
-        return <Bookmark className="w-3.5 h-3.5 text-emerald-400" />;
+        return <Bookmark className="w-3.5 h-3.5 text-[#36B37E] fill-[#36B37E]/20 shrink-0" />;
     }
   };
 
@@ -87,99 +75,70 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
         e.dataTransfer.effectAllowed = 'move';
       }}
       onClick={() => onClick?.(issue)}
-      className="group relative bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 rounded-xl p-3.5 shadow-sm hover:shadow-md transition-all duration-150 cursor-pointer active:cursor-grabbing select-none"
+      className="group bg-white dark:bg-[#2C333A] hover:bg-[#FAFBFC] dark:hover:bg-[#323940] border border-[#DFE1E6] dark:border-[#38414A] rounded p-2.5 shadow-[0_1px_1px_rgba(9,30,66,0.25)] dark:shadow-[0_1px_1px_rgba(0,0,0,0.5)] transition-all cursor-pointer select-none relative"
     >
-      {/* Top Header: Key, Type, Epic, Points */}
-      <div className="flex items-center justify-between gap-2 mb-2">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="p-1 rounded bg-slate-700/60 flex items-center justify-center">
-            {renderTypeIcon()}
-          </span>
-          <span className="text-xs font-mono font-semibold text-slate-300">
-            {issue.key}
-          </span>
-          {issue.epicTitle && (
-            <span
-              className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-opacity-40"
-              style={{
-                borderColor: issue.epicColor || '#6366F1',
-                color: issue.epicColor || '#6366F1',
-                backgroundColor: `${issue.epicColor || '#6366F1'}15`,
-              }}
-            >
-              {issue.epicTitle}
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          {issue.storyPoints !== null && issue.storyPoints !== undefined && (
-            <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              {issue.storyPoints} {issue.storyPoints === 1 ? 'pt' : 'pts'}
-            </span>
-          )}
-          <button
-            onClick={() => onDelete(issue.id)}
-            title="Delete issue"
-            className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-400 rounded transition-opacity"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
+      {/* 1. Issue Title (Jira 13px medium, #172B4D) */}
+      <div className="text-[13px] font-medium text-[#172B4D] dark:text-[#DEE4EA] leading-tight line-clamp-2 mb-2">
+        {issue.title}
       </div>
 
-      {/* Title */}
-      <h4 className="text-sm font-medium text-slate-100 leading-snug mb-1.5">
-        {issue.title}
-      </h4>
-
-      {/* Description Snippet */}
-      {issue.description && (
-        <p className="text-xs text-slate-400 line-clamp-2 mb-2">
-          {issue.description}
-        </p>
+      {/* 2. Epic Lozenge (Jira Style: [Phase 1] Authentication & JWT... ⌄) */}
+      {issue.epicTitle && (
+        <div className="mb-2">
+          <span 
+            className="inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded border max-w-full truncate"
+            style={{
+              borderColor: `${issue.epicColor || '#6554C0'}50`,
+              backgroundColor: `${issue.epicColor || '#6554C0'}15`,
+              color: issue.epicColor || '#6554C0',
+            }}
+          >
+            <span 
+              className="w-1.5 h-1.5 rounded-xs shrink-0"
+              style={{ backgroundColor: issue.epicColor || '#6554C0' }}
+            />
+            <span className="truncate">{issue.epicTitle}</span>
+          </span>
+        </div>
       )}
 
-      {/* Subtask Checklist Summary */}
+      {/* 3. Subtask Checklist Summary (if any) */}
       {totalSubtasks > 0 && (
-        <div className="mt-2.5 pt-2 border-t border-slate-700/60">
+        <div 
+          className="mb-2 pt-1 border-t border-[#EBECF0] dark:border-[#38414A]"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
             type="button"
             onClick={() => setShowSubtasks(!showSubtasks)}
-            className="flex items-center justify-between w-full text-left text-xs text-slate-400 hover:text-slate-200 transition-colors"
+            className="flex items-center justify-between w-full text-[11px] text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-[#DEE4EA]"
           >
-            <div className="flex items-center gap-1.5">
-              <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
-              <span>Checklist ({completedSubtasks}/{totalSubtasks})</span>
+            <div className="flex items-center gap-1">
+              <CheckSquare className="w-3 h-3 text-[#5E6C84] dark:text-[#8C9BAB]" />
+              <span>{completedSubtasks}/{totalSubtasks} tasks</span>
             </div>
-            <span className="text-[10px] text-slate-400">
-              {showSubtasks ? 'Hide' : 'Show'}
-            </span>
+            <div className="w-14 bg-[#EBECF0] dark:bg-[#1D2125] h-1 rounded-full overflow-hidden">
+              <div
+                className="bg-[#36B37E] h-full"
+                style={{ width: `${(completedSubtasks / totalSubtasks) * 100}%` }}
+              />
+            </div>
           </button>
 
-          {/* Subtask Progress Bar */}
-          <div className="w-full bg-slate-700/60 h-1.5 rounded-full overflow-hidden mt-1.5">
-            <div
-              className="bg-emerald-500 h-full transition-all duration-300"
-              style={{ width: `${totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0}%` }}
-            />
-          </div>
-
-          {/* Expanded Subtask List */}
           {showSubtasks && (
-            <div className="mt-2 space-y-1.5 pl-1">
+            <div className="mt-1.5 space-y-1 pl-1">
               {issue.subtasks.map((st) => (
                 <div
                   key={st.id}
                   onClick={() => onToggleSubtask(st.id, !st.isCompleted, st.title)}
-                  className="flex items-center gap-2 text-xs cursor-pointer hover:text-slate-200 text-slate-300 transition-colors"
+                  className="flex items-center gap-1.5 text-[11px] cursor-pointer text-[#42526E] dark:text-[#DEE4EA]"
                 >
                   {st.isCompleted ? (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-3 h-3 text-[#36B37E] shrink-0" />
                   ) : (
-                    <Circle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <Circle className="w-3 h-3 text-[#8993A4] shrink-0" />
                   )}
-                  <span className={st.isCompleted ? 'line-through text-slate-400' : ''}>
+                  <span className={st.isCompleted ? 'line-through text-[#8993A4]' : ''}>
                     {st.title}
                   </span>
                 </div>
@@ -189,75 +148,70 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
         </div>
       )}
 
-      {/* Add Subtask Form */}
-      {showSubtasks && (
-        <div className="mt-2 pt-2 border-t border-slate-700/40">
-          {isAddingSubtask ? (
-            <form onSubmit={handleAddSubtaskSubmit} className="flex items-center gap-1.5">
-              <input
-                type="text"
-                value={newSubtaskTitle}
-                onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                placeholder="Checklist item..."
-                autoFocus
-                className="flex-1 bg-slate-900/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-              />
+      {/* 4. Bottom Metadata Row (Type Icon, Key, Quick Nav, Points, Avatar) */}
+      <div className="flex items-center justify-between gap-1 pt-1 border-t border-[#EBECF0] dark:border-[#38414A] text-[11px]">
+        {/* Left: Type Icon + Issue Key */}
+        <div className="flex items-center gap-1.5">
+          {renderTypeIcon()}
+          <span className="font-mono text-[11px] font-semibold text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#0052CC] dark:hover:text-[#579DFF] hover:underline">
+            {issue.key}
+          </span>
+        </div>
+
+        {/* Right: Quick Move chevrons (Mobile & Desktop), Points Box, Avatar */}
+        <div className="flex items-center gap-1.5">
+          {/* Quick Column Shift (Jira / Rally style mobile helper) */}
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
+            {canMovePrev && (
               <button
-                type="submit"
-                className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-medium"
+                onClick={handlePrev}
+                title="Move to previous column"
+                className="p-0.5 text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-white rounded"
               >
-                Add
+                <ChevronLeft className="w-3 h-3" />
               </button>
+            )}
+            {canMoveNext && (
               <button
-                type="button"
-                onClick={() => setIsAddingSubtask(false)}
-                className="px-1.5 py-1 text-slate-400 hover:text-slate-200 text-xs"
+                onClick={handleNext}
+                title="Advance to next column"
+                className="p-0.5 text-[#5E6C84] dark:text-[#8C9BAB] hover:text-[#172B4D] dark:hover:text-white rounded"
               >
-                ✕
+                <ChevronRight className="w-3 h-3" />
               </button>
-            </form>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsAddingSubtask(true)}
-              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-indigo-400 transition-colors"
+            )}
+          </div>
+
+          {/* Rally / Jira Story Points Badge */}
+          {issue.storyPoints !== null && issue.storyPoints !== undefined && (
+            <div 
+              className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#EBECF0] dark:bg-[#1D2125] text-[#42526E] dark:text-[#DEE4EA] font-mono text-[10px] font-bold flex items-center justify-center border border-[#DFE1E6] dark:border-[#38414A]"
+              title={`${issue.storyPoints} Story Points`}
             >
-              <Plus className="w-3 h-3" /> Add item
-            </button>
+              {issue.storyPoints}
+            </div>
           )}
+
+          {/* Assignee Avatar Circle (Matches Jira screenshot!) */}
+          <div 
+            className="w-5 h-5 rounded-full bg-[#0052CC] text-white font-bold text-[10px] flex items-center justify-center shadow-xs"
+            title="Assigned to Satyam"
+          >
+            S
+          </div>
+
+          {/* Delete Icon on Hover */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(issue.id);
+            }}
+            title="Delete issue"
+            className="opacity-0 group-hover:opacity-100 p-0.5 text-[#8993A4] hover:text-[#DE350B] rounded transition-opacity"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
         </div>
-      )}
-
-      {/* Quick Move Footer (Mobile & Desktop Touch Quick Moves) */}
-      <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-700/40 text-[11px] text-slate-400">
-        <button
-          onClick={handlePrev}
-          disabled={!canMovePrev}
-          className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded transition-colors ${
-            canMovePrev ? 'hover:bg-slate-700 hover:text-slate-200 text-slate-400' : 'opacity-20 cursor-not-allowed'
-          }`}
-          title="Move back"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
-        </button>
-
-        <div className="flex items-center gap-1 text-slate-400 text-[10px]">
-          <GripVertical className="w-3 h-3 text-slate-400" />
-          <span>Drag or Move</span>
-        </div>
-
-        <button
-          onClick={handleNext}
-          disabled={!canMoveNext}
-          className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded transition-colors ${
-            canMoveNext ? 'hover:bg-slate-700 hover:text-slate-200 text-slate-400' : 'opacity-20 cursor-not-allowed'
-          }`}
-          title="Advance to next column"
-        >
-          <span>Next</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
       </div>
     </div>
   );
